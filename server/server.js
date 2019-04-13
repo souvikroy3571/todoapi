@@ -19,6 +19,16 @@ app.post('/todos',(req,res)=>{
   })
 });
 
+app.get('/todos',(req,res)=>{
+  todo.find().then((todos)=>{
+    res.send({
+      todos,
+    });
+  },(e)=>{
+    res.status(400).send(e);
+  })
+});
+
 
 // var todo1=new todo({
 //   text:'    ',
