@@ -2,10 +2,12 @@ const expect=require('expect');
 const request=require('supertest');
 const {app}=require('./../server.js');
 const {todo}=require('./../models/todo.js');
-
+const {ObjectID} =require('mongodb');
 const todos=[{
+  _id:new ObjectID(),
   text:'first task'
 },{
+  _id:new ObjectID(),
   text:'second task'
 }];
 
@@ -76,6 +78,47 @@ it('should get todos data',(done)=>{
       expect(res.body.todos.length).toBe(2);
     })
     .end(done)
+});
+
+});
+
+describe('GET /todos/id',()=>{
+it('should get specific todos data',(done)=>{
+  var text=todos[0]._id.toHexString();
+
+  request(app)
+    .get(`/todos/${text}`)
+    .expect(200)
+    .expect((res)=>{
+      // console.log(res);
+      expect(res.body.todos.text).toBe(todos[0].text);
+    })
+    .end(done);
+});
+
+it('should get no specific todos data for invalid id',(done)=>{
+  var text=123;
+
+  request(app)
+    .get(`/todos/${text}`)
+    .expect(400)
+    .expect((res)=>{
+      // console.log(res);
+      expect(res.body.message).toBe('id invalid');
+    })
+    .end(done);
+});
+
+it('should get specific todos data',(done)=>{
+  var text=new ObjectID();
+  request(app)
+    .get(`/todos/${text}`)
+    .expect(400)
+    .expect((res)=>{
+      // console.log(res);
+      expect(res.body.message).toBe('id not found');
+    })
+    .end(done);
 });
 
 });

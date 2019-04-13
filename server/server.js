@@ -1,5 +1,6 @@
 var express=require('express');
 var bodyParser=require('body-parser');
+const {ObjectID} =require('mongodb');
 
 var {mongoose}=require('./db/mongoose.js');
 var {user}=require('./models/user.js');
@@ -29,29 +30,29 @@ app.get('/todos',(req,res)=>{
   });
 });
 
+app.get('/todos/:id',(req,res)=>{
+  var id =  req.params.id;
+  if(!ObjectID.isValid(id)){
+    res.status(400).send({
+      message:'id invalid'
+    });
+    };
+  todo.findById(id).then((todos)=>{
+    if(!todos){
+      return res.status(400).send({
+        message:'id not found'
+      });
+    };
 
-// var todo1=new todo({
-//   text:'    ',
-//   completed:false,
-//   completedAt:1555085969
-// });
 
-// todo1.save().then((doc)=>{
-//   console.log('Saved to ',doc)
-// }, (e)=>{
-//   console.log('Unable to save todo ',e)
-// })
+    res.status(200).send({
+      todos,
+    });
+  },(e)=>{
+    res.status(400).send(e);
+});
+});
 
-// var user1=new user({
-//   email:'  souvikroy3571@gmai.com  ',
-//   password:'karizma',
-// });
-//
-// user1.save().then((doc)=>{
-//   console.log('Saved to ',doc)
-// }, (e)=>{
-//   console.log('Unable to save todo ',e)
-// });
 
 app.listen(3000,()=>{
   console.log('Started on port 3000');
