@@ -8,7 +8,9 @@ const todos=[{
   text:'first task'
 },{
   _id:new ObjectID(),
-  text:'second task'
+  text:'second task',
+  completed:true,
+  completedAt:123456
 }];
 
 beforeEach((done)=>{
@@ -119,6 +121,119 @@ it('should get specific todos data',(done)=>{
       expect(res.body.message).toBe('id not found');
     })
     .end(done);
+});
+
+});
+
+
+
+describe('DELETE /todos',()=>{
+
+it('should delete todos data',(done)=>{
+  var text=todos[0]._id;
+  request(app)
+    .delete(`/todos/${text}`)
+    .expect(200)
+    .expect((res)=>{
+      // console.log(res);
+      expect(res.body.todo._id).toBe(todos[0]._id.toHexString());
+      // expect(res.body.todo.count).toBe(1);
+    })
+    .end((err,res)=>{
+      if(err){
+        return done(err);
+      };
+
+      request(app)
+        .delete(`/todos/${text}`)
+        .expect(400)
+        .expect((res)=>{
+          // console.log(res);
+          expect(res.body.message).toBe('id not found');
+        })
+        .end(done);
+    });
+
+});
+
+it('should get no specific todos data for invalid id',(done)=>{
+  var text=123;
+
+  request(app)
+    .delete(`/todos/${text}`)
+    .expect(400)
+    .expect((res)=>{
+      // console.log(res);
+      expect(res.body.message).toBe('id invalid');
+    })
+    .end(done)
+});
+
+it('should get specific todos data',(done)=>{
+  var text=new ObjectID();
+  request(app)
+    .get(`/todos/${text}`)
+    .expect(400)
+    .expect((res)=>{
+      // console.log(res);
+      expect(res.body.message).toBe('id not found');
+    })
+    .end(done);
+});
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+describe('PATCH /todos',()=>{
+
+it('should update todos data',(done)=>{
+  var text=todos[0]._id;
+  request(app)
+    .patch(`/todos/${text}`)
+    .send({
+      text:'First task updated',
+      completed:true
+    })
+    .expect(200)
+    .expect((res)=>{
+      // console.log(res);
+      expect(res.body.todo.text).toBe('First task updated');
+      expect(res.body.todo.completed).toBe(true);
+      expect(res.body.todo.completedAt).toBeGreaterThan(0);
+      // expect(res.body.todo.count).toBe(1);
+    })
+    .end(done);
+
+});
+
+it('should toggle todos data',(done)=>{
+  var text=todos[1]._id;
+  request(app)
+    .patch(`/todos/${text}`)
+    .send({
+      text:'First task re updated',
+      completed:false
+    })
+    .expect(200)
+    .expect((res)=>{
+      // console.log(res);
+      expect(res.body.todo.text).toBe('First task re updated');
+      expect(res.body.todo.completed).toBe(false);
+      expect(res.body.todo.completedAt).toBe(null);
+      // expect(res.body.todo.count).toBe(1);
+    })
+    .end(done)
+
 });
 
 });
